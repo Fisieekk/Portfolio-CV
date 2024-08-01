@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply flex flex-col h-screen bg-amber-50;
+}
+
+.main_container {
+  @apply flex flex-col justify-start;
+}
+
+.main_container_horizontal {
+  @apply flex items-start space-x-4 p-10 bg-gray-800;
+}
+
+.name_text {
+  @apply text-white text-2xl w-64 h-12 bg-black text-center pt-1;
+}
+
+.menu_list {
+  @apply relative bg-black text-white w-32 h-12 text-center pt-1;
+}
+
+.collapse-content {
+  @apply absolute z-20 bg-black text-white w-32;
+}
+
+.hover-text:hover {
+  @apply bg-gray-800 text-black cursor-pointer;
+}
