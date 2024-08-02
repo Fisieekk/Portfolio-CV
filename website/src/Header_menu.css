@@ -11,7 +11,7 @@ body {
 }
 
 .main_container_horizontal {
-  @apply flex items-start space-x-4 p-10 bg-gray-800;
+  @apply flex items-start space-x-4 p-10 bg-gray-800 h-[15vh];
 }
 
 .name_text {

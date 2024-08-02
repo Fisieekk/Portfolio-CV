@@ -1,114 +1,129 @@
-import React, { useState } from 'react';
-import { IconButton, Card, CardContent, Typography, Box, Popover, Link } from "@mui/material";
-import { ChevronLeft, ChevronRight } from "@mui/icons-material";
+import React, { useCallback, useEffect, useState } from 'react';
+import { Card, Typography, Box, IconButton } from "@mui/material";
+import { ChevronRight } from "@mui/icons-material";
+import './Projects_list_gallery.css'; // Import the CSS file with the animation styles
 
 const projects_images = [
-    { url: "src/assets/ChessGame_img.png", title: <Link href="" underline="hover" color="inherit"> Chess Game </Link> , desc: "Simple Chess Game with Stockfish bot implementation", link: "https://github.com/Fisieekk/ChessGame" },
-    { url: "src/assets/Restaurant_Mongo_DataBase_img.png", title: <Link href="" underline="hover" color="inherit"> Restaurant Mongo DataBase </Link>, desc: "Not quite beautiful website with much better Mongo DataBase", link: "https://github.com/Fisieekk/Restaurant_Mongo_DataBase"},
-    { url: "src/assets/Stochastic_Minimization_img.png", title: <Link href="" underline="hover" color="inherit"> Stochastic Minimization </Link>, desc: "Stochastic Minimization in R" , link: "https://github.com/Fisieekk/Stochastic_Minimization"},
-    { url: "src/assets/Darwin_World_img.png", title: <Link href="" underline="hover" color="inherit"> Darwin World </Link>, desc: "Java-Gradle Animal Environment Simulation" , link: "https://github.com/Fisieekk/Java_Gradle_Environment-Darwin_World"},
-    { url: "src/assets/FEM_img.png", title: <Link href="" underline="hover" color="inherit"> FEM </Link>, desc: "Finite element method in R" , link: "https://github.com/Fisieekk/FEM_Differential_calculus-R"},
+    { url: "src/assets/JustGithub_img.png", title: "Just Github", desc: "Just Github", link: "https://github.com/Fisieekk"},
+    { url: "src/assets/ChessGame_img.png", title: "Chess Game", desc: "Simple Chess Game with Stockfish bot implementation", link: "https://github.com/Fisieekk/ChessGame" },
+    { url: "src/assets/Restaurant_Mongo_DataBase_img.png", title: "Restaurant Mongo DataBase", desc: "Not quite beautiful website with much better Mongo DataBase", link: "https://github.com/Fisieekk/Restaurant_Mongo_DataBase" },
+    { url: "src/assets/Stochastic_Minimization_img.png", title: "Stochastic Minimization", desc: "Stochastic Minimization in R", link: "https://github.com/Fisieekk/Stochastic_Minimization" },
+    { url: "src/assets/Darwin_World_img.png", title: "Darwin World", desc: "Java-Gradle Animal Environment Simulation", link: "https://github.com/Fisieekk/Java_Gradle_Environment-Darwin_World" },
+    { url: "src/assets/FEM_img.png", title: "FEM", desc: "Finite element method in R", link: "https://github.com/Fisieekk/FEM_Differential_calculus-R" },
 ];
 
 const Projects_list_gallery = () => {
-    const [currIndex, setCurrIndex] = useState(0);
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [popoverContent, setPopoverContent] = useState('');
-    const [mouseX, setMouseX] = useState();
-    const [mouseY, setMouseY] = useState();
+    const [currentBatch, setCurrentBatch] = useState(0);
+    const [prevBatch, setPrevBatch] = useState(0); // Track previous batch for animation
+    const batchSize = 3;
 
+    const currentProjects = projects_images.slice(
+        currentBatch * batchSize,
+        (currentBatch + 1) * batchSize
+    );
 
-    const goLeft = () => {
-        setCurrIndex((currIndex + projects_images.length - 1) % projects_images.length);
-    }
+    const [y, setY] = useState(window.scrollY);
 
-    const goRight = () => {
-        setCurrIndex((currIndex + 1) % projects_images.length);
-    }
+    const handleNavigation = useCallback(
+        e => {
+            const window = e.currentTarget;
+            if (y > window.scrollY) {
+                if (currentBatch > 0) {
+                    setPrevBatch(currentBatch);
+                    setCurrentBatch(prevBatch => prevBatch - 1);
+                }
+            } else if (y < window.scrollY) {
+                if ((currentBatch + 1) * batchSize < projects_images.length) {
+                    setPrevBatch(currentBatch);
+                    setCurrentBatch(prevBatch => prevBatch + 1);
+                }
+            }
+            setY(window.scrollY);
+        }, [y, currentBatch, prevBatch]
+    );
 
-    const handlePopoverOpen = (event, content) => {
-        setAnchorEl(event.currentTarget);
-        setPopoverContent(content);
-    };
+    useEffect(() => {
+        setY(window.scrollY);
+        window.addEventListener("scroll", handleNavigation);
 
-    const handlePopoverClose = () => {
-        setAnchorEl(null);
-    };
-
-    const open = Boolean(anchorEl);
+        return () => {
+            window.removeEventListener("scroll", handleNavigation);
+        };
+    }, [handleNavigation]);
 
     return (
-        <>
-            <div className="flex items-center justify-center bg-black">
-                <IconButton onClick={goLeft} className="z-10">
-                    <ChevronLeft className="text-white"/>
-                </IconButton>
-                <div className="overflow-hidden w-full">
-                    <div
-                        className="whitespace-nowrap transition-transform duration-500"
-                        style={{ transform: `translateX(-${currIndex * 100}%)` }}
-                    >
-                        {projects_images.map((image, index) => (
-                            <div key={index} className="inline-block w-full h-auto relative">
-                                <a href={image.link} target="_blank" rel="noreferrer">
-                                <img
-                                    src={image.url}
-                                    alt={`Slide ${index}`}
-                                    style={{ height: '84vh' , width: '80%', alignItems: 'center' }}
-                                    onMouseEnter={(e) => handlePopoverOpen(e, image.desc)}
-                                    onMouseLeave={handlePopoverClose}
-                                    className="hover:text-gray-400 cursor-pointer"
+        <Box display="flex" flexDirection="column" alignItems="center" bgcolor="black" p={2} height="86vh">
+            {currentProjects.map((image, index) => {
+                // Determine if the current image should slide in or out
+                const isVisible = index >= currentBatch * batchSize && index < (currentBatch + 1) * batchSize;
+                const isPreviousBatch = index >= prevBatch * batchSize && index < (prevBatch + 1) * batchSize;
+                let animationClass = '';
+
+                if (isVisible) {
+                    animationClass = 'slide-in';
+                } else if (isPreviousBatch) {
+                    animationClass = 'slide-out';
+                }
+
+                return (
+                    <Card key={index} sx={{ width: '80%', mb: 2, position: 'relative', overflow: 'hidden', borderRadius: '25px' }}>
+                        <a href={image.link} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
+                            <Box
+                                sx={{
+                                    height: '25vh',
+                                    backgroundImage: `url(${image.url})`,
+                                    backgroundSize: 'cover',
+                                    backgroundPosition: 'center',
+                                    borderRadius: '20px',
+                                    position: 'relative',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'flex-end',
+                                    color: 'white',
+                                    textShadow: '1px 1px 4px rgba(0, 0, 0, 0.8)',
+                                    padding: '16px',
+                                }}
+                                className={animationClass}
+                            >
+                                <Box
+                                    sx={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        width: '100%',
+                                        height: '100%',
+                                        background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 139, 0.5))',
+                                        borderRadius: '20px',
+                                        zIndex: 1,
+                                    }}
                                 />
-                                </a>
-                                {/*<Card*/}
-                                {/*    className="absolute bottom-0 left-0 right-0"*/}
-                                {/*    style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}*/}
-                                {/*>*/}
-                                {/*    <CardContent style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>*/}
-                                {/*        <Typography variant="h6" component="div" style={{ color: '#fff' }}>*/}
-                                {/*            {image.title}*/}
-                                {/*        </Typography>*/}
-                                {/*        <div*/}
-                                {/*            onMouseEnter={(e) => handlePopoverOpen(e, image.desc)}*/}
-                                {/*            onMouseLeave={handlePopoverClose}*/}
-                                {/*            className="hover:text-gray-400 cursor-pointer"*/}
-                                {/*        >*/}
-                                {/*            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="white" className="size-6">*/}
-                                {/*                <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />*/}
-                                {/*            </svg>*/}
-                                {/*        </div>*/}
-                                {/*    </CardContent>*/}
-                                {/*</Card>*/}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-                <IconButton onClick={goRight} className="z-10">
-                    <ChevronRight className="text-white"/>
-                </IconButton>
-            </div>
-            <Popover
-                sx={{
-                    pointerEvents: 'none',
-                }}
-                open={open}
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'left',
-                }}
-                disableRestoreFocus
-            >
-                <Box p={2}>
-                    {popoverContent}
-                </Box>
-            </Popover>
-        </>
-    )
-}
+                                <Box sx={{ position: 'relative', zIndex: 2 }}>
+                                    <Typography variant="h5" component="div">
+                                        {image.title}
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        {image.desc}
+                                    </Typography>
+                                </Box>
+                                <IconButton
+                                    sx={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        right: '16px',
+                                        transform: 'translateY(-50%)',
+                                        color: 'white',
+                                        zIndex: 2,
+                                    }}
+                                >
+                                    <ChevronRight onClick={() => window.open(image.link)} />
+                                </IconButton>
+                            </Box>
+                        </a>
+                    </Card>
+                );
+            })}
+        </Box>
+    );
+};
 
 export default Projects_list_gallery;
