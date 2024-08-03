@@ -1,3 +1,13 @@
+.sector {
+    position: absolute;
+    justify-content: center;
+    height: 86vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .slide-in {
     animation: slideIn 0.5s forwards;
 }
@@ -5,6 +15,7 @@
 .slide-out {
     animation: slideOut 0.5s forwards;
 }
+
 
 @keyframes slideIn {
     from {
