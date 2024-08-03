@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  @apply flex flex-col h-screen bg-amber-50;
+  @apply flex flex-col h-screen bg-amber-50 font-bold;
 }
 
 .main_container {
@@ -11,19 +11,23 @@ body {
 }
 
 .main_container_horizontal {
-  @apply flex items-start space-x-4 p-10 bg-gray-800 h-[15vh];
+  @apply flex items-center justify-between p-10 bg-[#f0ead6] h-[15vh];
 }
 
 .name_text {
-  @apply text-white text-2xl w-64 h-12 bg-black text-center pt-1;
+  @apply text-[#6a4a3a] text-2xl w-64 h-12 text-center pt-2 rounded-3xl;
+}
+
+.menu_container {
+  @apply flex flex-row space-x-4;
 }
 
 .menu_list {
-  @apply relative bg-black text-white w-32 h-12 text-center pt-1;
+  @apply relative text-[#6a4a3a] w-32 h-12 text-center pt-3 rounded-3xl m-0;
 }
 
 .collapse-content {
-  @apply absolute z-20 bg-black text-white w-32;
+  @apply absolute z-20 text-[#6a4a3a] w-32 rounded-b-3xl rounded-t-xl;
 }
 
 .hover-text:hover {

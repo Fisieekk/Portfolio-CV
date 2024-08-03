@@ -1,8 +1,9 @@
 import './Header_menu.css';
-import React from 'react';
+import React,{memo} from 'react';
 import {Collapse, Box, Popover} from "@mui/material";
 
-function Header_menu() {
+// eslint-disable-next-line react/display-name
+const Header_menu= memo(() => {
     const [openList1, setOpenList1] = React.useState(false);
     // const [openList2, setOpenList2] = React.useState(false);
     const [openList3, setOpenList3] = React.useState(false);
@@ -17,19 +18,12 @@ function Header_menu() {
         setOpenList1(false);
     };
 
-    // const handleOpenList2 = () => {
-    //     setOpenList2(true);
-    // };
-    //
-    // const handleCloseList2 = () => {
-    //     setOpenList2(false);
-    // };
 
-    const handleOpenList3 = () => {
+    const handleOpenList2 = () => {
         setOpenList3(true);
     };
 
-    const handleCloseList3 = () => {
+    const handleCloseList2 = () => {
         setOpenList3(false);
     };
 
@@ -44,6 +38,15 @@ function Header_menu() {
 
     const open = Boolean(anchorEl);
 
+
+    async function copyTextToClipboard(text) {
+        if ('clipboard' in navigator) {
+            return await navigator.clipboard.writeText(text);
+        } else {
+            return document.execCommand('copy', true, text);
+        }
+    }
+
     return (
         <>
             <div className="main_container">
@@ -51,101 +54,52 @@ function Header_menu() {
                     <p>
                         <h1 className="name_text">Marcin Serafin </h1>
                     </p>
+                    <div className="menu_container">
                     <div
                         className="menu_list"
                         onMouseEnter={handleOpenList1}
                         onMouseLeave={handleCloseList1}
                     >
-                        <div style={{ color: 'white', cursor: 'pointer' }}>
+                        <div style={{ color: '#6a4a3a', cursor: 'pointer' }}>
                             About
                         </div>
                         <Collapse in={openList1} className="collapse-content">
                             <Box mt={2}>
-                                <p
-                                    onMouseEnter={(e) => handlePopoverOpen(e, "Details about Item 1.1")}
-                                    onMouseLeave={handlePopoverClose}
-                                    className="hover:text-gray-400 cursor-pointer p-1"
-                                >
-                                    CV
+                                <p className="hover:text-gray-400 cursor-pointer p-1">
+                                    <a href="/">
+                                        CV
+                                    </a>
                                 </p>
-                                <p
-                                    onMouseEnter={(e) => handlePopoverOpen(e, "Details about Item 1.2")}
-                                    onMouseLeave={handlePopoverClose}
-                                    className="hover:text-gray-400 cursor-pointer p-1"
-                                >
-                                    GitHub
+                                <p className="hover:text-gray-400 cursor-pointer p-1">
+                                    <a href="https://github.com/Fisieekk">
+                                        GitHub
+                                    </a>
                                 </p>
                             </Box>
                         </Collapse>
                     </div>
-                    {/*<div*/}
-                    {/*    className="menu_list"*/}
-                    {/*    onMouseEnter={handleOpenList2}*/}
-                    {/*    onMouseLeave={handleCloseList2}*/}
-                    {/*>*/}
-                    {/*    <div style={{ color: 'white', cursor: 'pointer' }}>*/}
-                    {/*        Projects*/}
-                    {/*    </div>*/}
-                    {/*    <Collapse in={openList2} className="collapse-content">*/}
-                    {/*        <Box mt={2}>*/}
-                    {/*            <p*/}
-                    {/*                onMouseEnter={(e) => handlePopoverOpen(e, "Simple Chess Game with Stockfish bot implementation")}*/}
-                    {/*                onMouseLeave={handlePopoverClose}*/}
-                    {/*                className="hover:text-gray-400 cursor-pointer p-1"*/}
-                    {/*            >*/}
-                    {/*                <Link href="" underline="hover"> ChessGame </Link>*/}
-                    {/*            </p>*/}
-                    {/*            <p*/}
-                    {/*                onMouseEnter={(e) => handlePopoverOpen(e, "Not quite beautiful website with much better Mongo DataBase")}*/}
-                    {/*                onMouseLeave={handlePopoverClose}*/}
-                    {/*                className="hover:text-gray-400 cursor-pointer p-1"*/}
-                    {/*            >*/}
-                    {/*                <Link href="" underline="hover"> Restaurant Mongo DataBase </Link>*/}
-                    {/*            </p>*/}
-                    {/*            <p*/}
-                    {/*                onMouseEnter={(e) => handlePopoverOpen(e, "Stochastic Minimization in R")}*/}
-                    {/*                onMouseLeave={handlePopoverClose}*/}
-                    {/*                className="hover:text-gray-400 cursor-pointer p-1"*/}
-                    {/*            >*/}
-                    {/*                <Link href="" underline="hover"> Stochastic Minimization </Link>*/}
-                    {/*            </p>*/}
-                    {/*            <p*/}
-                    {/*                onMouseEnter={(e) => handlePopoverOpen(e, "Java-Gradle Animal Environment Simulation")}*/}
-                    {/*                onMouseLeave={handlePopoverClose}*/}
-                    {/*                className="hover:text-gray-400 cursor-pointer p-1"*/}
-                    {/*            >*/}
-                    {/*                <Link href="" underline="hover"> Darwin World </Link>*/}
-                    {/*            </p>*/}
-                    {/*            <p*/}
-                    {/*                onMouseEnter={(e) => handlePopoverOpen(e, "Finite element method in R")}*/}
-                    {/*                onMouseLeave={handlePopoverClose}*/}
-                    {/*                className="hover:text-gray-400 cursor-pointer p-1"*/}
-                    {/*            >*/}
-                    {/*                <Link href="" underline="hover"> FEM </Link>*/}
-                    {/*            </p>*/}
-                    {/*        </Box>*/}
-                    {/*    </Collapse>*/}
-                    {/*</div>*/}
                     <div
                         className="menu_list"
-                        onMouseEnter={handleOpenList3}
-                        onMouseLeave={handleCloseList3}
+                        onMouseEnter={handleOpenList2}
+                        onMouseLeave={handleCloseList2}
                     >
-                        <div style={{color: 'white', cursor: 'pointer'}}>
+                        <div style={{color: '#6a4a3a', cursor: 'pointer'}}>
                             Contact
                         </div>
                         <Collapse in={openList3} className="collapse-content">
                             <Box mt={2}>
                                 <p
-                                    onMouseEnter={(e) => handlePopoverOpen(e, "Details about Item 3.1")}
+                                    onMouseEnter={(e) => handlePopoverOpen(e, "824784852   Click to Copy")}
                                     onMouseLeave={handlePopoverClose}
+                                    onClick={() => copyTextToClipboard("824784852")}
                                     className="hover:text-gray-400 cursor-pointer p-1"
                                 >
                                     Phone
                                 </p>
                                 <p
-                                    onMouseEnter={(e) => handlePopoverOpen(e, "Details about Item 3.2")}
+                                    onMouseEnter={(e) => handlePopoverOpen(e, "Marcin.Serafin0325@gmail.com   Click to Copy")}
                                     onMouseLeave={handlePopoverClose}
+                                    onClick={() => copyTextToClipboard("Marcin.Serafin0325@gmail.com")}
                                     className="hover:text-gray-400 cursor-pointer p-1"
                                 >
                                     Mail
@@ -153,7 +107,9 @@ function Header_menu() {
                             </Box>
                         </Collapse>
                     </div>
+                    </div>
                 </div>
+
             </div>
             <Popover
                 sx={{
@@ -177,6 +133,6 @@ function Header_menu() {
             </Popover>
         </>
     )
-}
+});
 
 export default Header_menu;
