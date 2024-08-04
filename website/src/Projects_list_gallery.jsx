@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Box, IconButton, Typography } from "@mui/material";
 import { ChevronRight, ArrowDownward } from "@mui/icons-material";
+import Draggable from 'react-draggable';
 import './Projects_list_gallery.css';
 
 // Predefined positions based on the number of images
@@ -28,7 +29,7 @@ const generatePositions = (numBubbles) => {
 
 // Images data
 const projects_images = [
-    { url: "src/assets/JustGithub_img.png", title: "Just Github", desc: "Just Github", link: "https://github.com/Fisieekk" },
+    // { url: "src/assets/JustGithub_img.png", title: "Just Github", desc: "Just Github", link: "https://github.com/Fisieekk" },
     { url: "src/assets/ChessGame_img.png", title: "Chess Game", desc: "Simple Chess Game with Stockfish bot implementation", link: "https://github.com/Fisieekk/ChessGame" },
     { url: "src/assets/Restaurant_Mongo_DataBase_img.png", title: "Restaurant Mongo DataBase", desc: "Not quite beautiful website with much better Mongo DataBase", link: "https://github.com/Fisieekk/Restaurant_Mongo_DataBase" },
     { url: "src/assets/Stochastic_Minimization_img.png", title: "Stochastic Minimization", desc: "Stochastic Minimization in R", link: "https://github.com/Fisieekk/Stochastic_Minimization" },
@@ -43,9 +44,9 @@ const Projects_list_gallery = () => {
     const [currentBatch, setCurrentBatch] = useState(0);
     const [prevBatch, setPrevBatch] = useState(0);
     const [positions, setPositions] = useState([]);
+    const containerRef = useRef(null); // Reference for the container
 
     useEffect(() => {
-        // Generate positions only once
         setPositions(generatePositions(batchSize));
     }, []);
 
@@ -76,21 +77,68 @@ const Projects_list_gallery = () => {
         }
     };
 
+    const handleDrag = (index, e, data) => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        const containerRect = container.getBoundingClientRect();
+        const bubbleWidth = (bubbleSize / 100) * window.innerWidth;
+        const bubbleHeight = (bubbleSize / 100) * window.innerHeight;
+
+        const newX = Math.min(
+            Math.max(0, data.x / window.innerWidth * 100),
+            100 - (bubbleWidth / window.innerWidth) * 100
+        );
+        const newY = Math.min(
+            Math.max(0, data.y / window.innerHeight * 100),
+            86 - (bubbleHeight / window.innerHeight) * 100
+        );
+
+        setPositions((prevPositions) => {
+            const newPositions = [...prevPositions];
+            newPositions[index] = { x: newX, y: newY };
+            return newPositions;
+        });
+    };
+
     return (
-        <Box display="flex" flexDirection="column" alignItems="center" p={2} height="86vh" overflow="hidden" position="relative" className="main_container">
+        <Box
+            ref={containerRef} // Reference for the container
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            p={2}
+            height="86vh"
+            overflow="hidden"
+            position="relative"
+            className="main_container"
+        >
             {Array.from({ length: numberOfBatches }).map((_, batchIndex) => (
                 <Box key={batchIndex} className={`sector ${currentBatch === batchIndex ? (batchIndex > prevBatch ? 'pop-in' : 'pop-in') : 'pop-out'}`}>
                     {projects_images.slice(batchSize * batchIndex, batchSize * (batchIndex + 1)).map((image, index) => (
-                        <Box
+                        <Draggable
                             key={index}
-                            className="bubble-card"
-                            style={{ left: `${positions[index % batchSize]?.x}vw`, top: `${positions[index % batchSize]?.y}vh` }}
+                            position={{
+                                x: positions[index % batchSize]?.x * window.innerWidth / 100,
+                                y: positions[index % batchSize]?.y * window.innerHeight / 100,
+                            }}
+                            onDrag={(e, data) => handleDrag(index % batchSize, e, data)}
+                            bounds="parent" // Set bounds to the container
                         >
-                            <a href={image.link} target="_blank" rel="noreferrer"  >
+                            <Box
+                                className="bubble-card"
+                                style={{
+                                    position: 'absolute',
+                                    left: 0,
+                                    top: 0,
+                                }}
+                            >
                                 <img src={image.url} alt={image.title} />
                                 <Box className="bubble-card-content">
                                     <Typography variant="h6" component="div">
-                                        {image.title}
+                                        <a href={image.link} target="_blank" rel="noreferrer">
+                                            {image.title}
+                                        </a>
                                     </Typography>
                                     <Typography variant="body2">
                                         {image.desc}
@@ -104,8 +152,8 @@ const Projects_list_gallery = () => {
                                         <ChevronRight onClick={() => window.open(image.link)} />
                                     </IconButton>
                                 </Box>
-                            </a>
-                        </Box>
+                            </Box>
+                        </Draggable>
                     ))}
                 </Box>
             ))}
@@ -129,7 +177,6 @@ const Projects_list_gallery = () => {
                 <IconButton onClick={handleArrowClick}>
                     <ArrowDownward sx={{ fontSize: 40, color: 'black' }} />
                 </IconButton>
-
             </Box>
         </Box>
     );
